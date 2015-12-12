@@ -1,0 +1,245 @@
+
+SunSyncProtoType.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000ce  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000122  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  00000122  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000154  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000028  00000000  00000000  00000190  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000261  00000000  00000000  000001b8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 0000015a  00000000  00000000  00000419  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000199  00000000  00000000  00000573  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000034  00000000  00000000  0000070c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000195  00000000  00000000  00000740  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000029  00000000  00000000  000008d5  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000048  00000000  00000000  000008fe  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0e c0       	rjmp	.+28     	; 0x1e <__ctors_end>
+   2:	15 c0       	rjmp	.+42     	; 0x2e <__bad_interrupt>
+   4:	14 c0       	rjmp	.+40     	; 0x2e <__bad_interrupt>
+   6:	13 c0       	rjmp	.+38     	; 0x2e <__bad_interrupt>
+   8:	12 c0       	rjmp	.+36     	; 0x2e <__bad_interrupt>
+   a:	11 c0       	rjmp	.+34     	; 0x2e <__bad_interrupt>
+   c:	10 c0       	rjmp	.+32     	; 0x2e <__bad_interrupt>
+   e:	0f c0       	rjmp	.+30     	; 0x2e <__bad_interrupt>
+  10:	0e c0       	rjmp	.+28     	; 0x2e <__bad_interrupt>
+  12:	0d c0       	rjmp	.+26     	; 0x2e <__bad_interrupt>
+  14:	0c c0       	rjmp	.+24     	; 0x2e <__bad_interrupt>
+  16:	0b c0       	rjmp	.+22     	; 0x2e <__bad_interrupt>
+  18:	0a c0       	rjmp	.+20     	; 0x2e <__bad_interrupt>
+  1a:	09 c0       	rjmp	.+18     	; 0x2e <__bad_interrupt>
+  1c:	08 c0       	rjmp	.+16     	; 0x2e <__bad_interrupt>
+
+0000001e <__ctors_end>:
+  1e:	11 24       	eor	r1, r1
+  20:	1f be       	out	0x3f, r1	; 63
+  22:	cf e5       	ldi	r28, 0x5F	; 95
+  24:	d2 e0       	ldi	r29, 0x02	; 2
+  26:	de bf       	out	0x3e, r29	; 62
+  28:	cd bf       	out	0x3d, r28	; 61
+  2a:	09 d0       	rcall	.+18     	; 0x3e <main>
+  2c:	4e c0       	rjmp	.+156    	; 0xca <_exit>
+
+0000002e <__bad_interrupt>:
+  2e:	e8 cf       	rjmp	.-48     	; 0x0 <__vectors>
+
+00000030 <setup>:
+
+
+void setup() {
+	
+	// Set pins to output so timer outputs will show up on them
+	DDRB |= _BV(0);			// Cold		
+  30:	b8 9a       	sbi	0x17, 0	; 23
+	DDRB |= _BV(1);			// Warm	
+  32:	b9 9a       	sbi	0x17, 1	; 23
+	
+	// Timer in Fast PWM mode
+	// Output A clears on match
+	// Output B sets on match
+	
+	TCCR0A = _BV(COM0A1) | _BV( COM0B1 ) |  _BV( COM0B0 ) | _BV( WGM01 ) | _BV( WGM00 );
+  34:	83 eb       	ldi	r24, 0xB3	; 179
+  36:	8a bd       	out	0x2a, r24	; 42
+	
+	// No prescaler
+	
+	TCCR0B = _BV( CS00 ) ;
+  38:	81 e0       	ldi	r24, 0x01	; 1
+  3a:	83 bf       	out	0x33, r24	; 51
+  3c:	08 95       	ret
+
+0000003e <main>:
+
+
+int main(void)
+{
+	
+	setup();
+  3e:	f8 df       	rcall	.-16     	; 0x30 <setup>
+	
+	DDRB |= _BV(2);
+  40:	ba 9a       	sbi	0x17, 2	; 23
+			OCR0A = x;
+			OCR0B = x;
+			_delay_ms(100);
+		}
+		*/
+		PORTB |= _BV(2);
+  42:	c2 9a       	sbi	0x18, 2	; 24
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  44:	89 ef       	ldi	r24, 0xF9	; 249
+  46:	90 e0       	ldi	r25, 0x00	; 0
+  48:	01 97       	sbiw	r24, 0x01	; 1
+  4a:	f1 f7       	brne	.-4      	; 0x48 <__SREG__+0x9>
+  4c:	00 c0       	rjmp	.+0      	; 0x4e <__SREG__+0xf>
+  4e:	00 00       	nop
+		_delay_ms(1);
+		PORTB &= ~_BV(2);
+  50:	c2 98       	cbi	0x18, 2	; 24
+  52:	80 e0       	ldi	r24, 0x00	; 0
+		
+		for(int c=0; c<2;c++) {
+		
+			for(int x=0;x<254;x++) {
+				OCR0A = x;
+  54:	89 bd       	out	0x29, r24	; 41
+				OCR0B = x;
+  56:	88 bd       	out	0x28, r24	; 40
+  58:	ed e8       	ldi	r30, 0x8D	; 141
+  5a:	f2 e1       	ldi	r31, 0x12	; 18
+  5c:	31 97       	sbiw	r30, 0x01	; 1
+  5e:	f1 f7       	brne	.-4      	; 0x5c <__SREG__+0x1d>
+  60:	00 c0       	rjmp	.+0      	; 0x62 <__SREG__+0x23>
+  62:	00 00       	nop
+  64:	8f 5f       	subi	r24, 0xFF	; 255
+		_delay_ms(1);
+		PORTB &= ~_BV(2);
+		
+		for(int c=0; c<2;c++) {
+		
+			for(int x=0;x<254;x++) {
+  66:	8e 3f       	cpi	r24, 0xFE	; 254
+  68:	a9 f7       	brne	.-22     	; 0x54 <__SREG__+0x15>
+  6a:	80 e0       	ldi	r24, 0x00	; 0
+				OCR0A = x;
+  6c:	89 bd       	out	0x29, r24	; 41
+				OCR0B = x;
+  6e:	88 bd       	out	0x28, r24	; 40
+  70:	ed e8       	ldi	r30, 0x8D	; 141
+  72:	f2 e1       	ldi	r31, 0x12	; 18
+  74:	31 97       	sbiw	r30, 0x01	; 1
+  76:	f1 f7       	brne	.-4      	; 0x74 <__SREG__+0x35>
+  78:	00 c0       	rjmp	.+0      	; 0x7a <__SREG__+0x3b>
+  7a:	00 00       	nop
+  7c:	8f 5f       	subi	r24, 0xFF	; 255
+		_delay_ms(1);
+		PORTB &= ~_BV(2);
+		
+		for(int c=0; c<2;c++) {
+		
+			for(int x=0;x<254;x++) {
+  7e:	8e 3f       	cpi	r24, 0xFE	; 254
+  80:	a9 f7       	brne	.-22     	; 0x6c <__SREG__+0x2d>
+		
+		
+		while (1) {
+			
+			OCR0A = 0;
+			OCR0B = 255;
+  82:	2f ef       	ldi	r18, 0xFF	; 255
+  84:	90 e8       	ldi	r25, 0x80	; 128
+		
+		
+		
+		while (1) {
+			
+			OCR0A = 0;
+  86:	19 bc       	out	0x29, r1	; 41
+			OCR0B = 255;
+  88:	28 bd       	out	0x28, r18	; 40
+  8a:	ff e9       	ldi	r31, 0x9F	; 159
+  8c:	36 e8       	ldi	r19, 0x86	; 134
+  8e:	41 e0       	ldi	r20, 0x01	; 1
+  90:	f1 50       	subi	r31, 0x01	; 1
+  92:	30 40       	sbci	r19, 0x00	; 0
+  94:	40 40       	sbci	r20, 0x00	; 0
+  96:	e1 f7       	brne	.-8      	; 0x90 <__SREG__+0x51>
+  98:	00 c0       	rjmp	.+0      	; 0x9a <__SREG__+0x5b>
+  9a:	00 00       	nop
+  9c:	89 2f       	mov	r24, r25
+			_delay_ms(500);
+			
+			
+			for(int x=128;x>0;x--) {
+				OCR0A = x;
+  9e:	89 bd       	out	0x29, r24	; 41
+				OCR0B = x;
+  a0:	88 bd       	out	0x28, r24	; 40
+  a2:	e1 e5       	ldi	r30, 0x51	; 81
+  a4:	f9 e9       	ldi	r31, 0x99	; 153
+  a6:	31 97       	sbiw	r30, 0x01	; 1
+  a8:	f1 f7       	brne	.-4      	; 0xa6 <__SREG__+0x67>
+  aa:	00 c0       	rjmp	.+0      	; 0xac <__SREG__+0x6d>
+  ac:	00 00       	nop
+  ae:	81 50       	subi	r24, 0x01	; 1
+			OCR0A = 0;
+			OCR0B = 255;
+			_delay_ms(500);
+			
+			
+			for(int x=128;x>0;x--) {
+  b0:	b1 f7       	brne	.-20     	; 0x9e <__SREG__+0x5f>
+				_delay_ms( (60*1000UL)/ (254+128) );
+			}
+			
+			
+			for(int x=0;x<254;x++) {
+				OCR0A = x;
+  b2:	89 bd       	out	0x29, r24	; 41
+				OCR0B = x;
+  b4:	88 bd       	out	0x28, r24	; 40
+  b6:	e1 e5       	ldi	r30, 0x51	; 81
+  b8:	f9 e9       	ldi	r31, 0x99	; 153
+  ba:	31 97       	sbiw	r30, 0x01	; 1
+  bc:	f1 f7       	brne	.-4      	; 0xba <__SREG__+0x7b>
+  be:	00 c0       	rjmp	.+0      	; 0xc0 <__SREG__+0x81>
+  c0:	00 00       	nop
+  c2:	8f 5f       	subi	r24, 0xFF	; 255
+				OCR0B = x;
+				_delay_ms( (60*1000UL)/ (254+128) );
+			}
+			
+			
+			for(int x=0;x<254;x++) {
+  c4:	8e 3f       	cpi	r24, 0xFE	; 254
+  c6:	a9 f7       	brne	.-22     	; 0xb2 <__SREG__+0x73>
+  c8:	de cf       	rjmp	.-68     	; 0x86 <__SREG__+0x47>
+
+000000ca <_exit>:
+  ca:	f8 94       	cli
+
+000000cc <__stop_program>:
+  cc:	ff cf       	rjmp	.-2      	; 0xcc <__stop_program>
